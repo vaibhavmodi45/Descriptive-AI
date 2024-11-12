@@ -1,6 +1,7 @@
-import streamlit as st # type: ignore
+# frontend.py
+import streamlit as st
+import requests
 from PIL import Image, ImageFilter
-# from streamlit_option_menu import option_menu # type: ignore
 
 # Page configuration
 st.set_page_config(page_title="Descriptive AI", layout="wide")
@@ -8,13 +9,18 @@ st.set_page_config(page_title="Descriptive AI", layout="wide")
 # CSS for custom styling
 st.markdown("""
     <style>
-    /* Navbar styling */
+
+    body {
+        height: 100px;       
+    }
+    
     .navbar {
+        margin-top: -50px;
         background-color: ;
         padding-left:2px;
         text-align: left;
         font-weight: bolder;
-        font-size: 44px;
+        font-size: 54px;
         color: black;
     }
 
@@ -23,7 +29,6 @@ st.markdown("""
         margin-bottom: 48px;
     }
     
-    /* Input, button, and generated content styling */
     .generate-btn {
         background-color: #ff4b4b;
         border-radius: 5px;
@@ -32,44 +37,55 @@ st.markdown("""
         font-weight: bold;
     }
     
-    /* Steps container */
     .steps-container {
         background-color: #f0f0f0;
         border-radius: 10px;
         padding: 20px;
-        margin-top:50px;
+        margin-top: 150px;
+    }
+            
+    .steps-container img {
+        width: 80%;
+        height: auto;
+    }
+            
+    .steps-container h2 {
+        font-size: 24px;
     }
     
-    /* Footer */
     .footer {
         text-align: center;
         padding: 10px;
-        background-color: #ff4b4b;
+        background-color: #ff4b4c;
         color: white;
-        position: scroll;
         margin-top: 100px;
         width: 100%;
+        margin-bottom: 0;
     }
     
     </style>
 """, unsafe_allow_html=True)
 
 # Navbar
-st.markdown('<div class="navbar">DESCRIPTIVE AI 📝 <hr></div>', unsafe_allow_html=True)
-
-# Toggle for Dark/Light Mode
-#theme = st.sidebar.radio('Choose theme', ['Light', 'Dark'])
+st.markdown('<div class="navbar">DESCRIPTIVE AI 📑 <hr></div>', unsafe_allow_html=True)
 
 # Input field
 user_input = st.text_input("Enter title or content")
 
 # Generate button
 if st.button("Generate"):
-    # Placeholder for the generated content
-    st.success(f"Generated content for: {user_input}")
+    if user_input:
+        response = requests.post("http://127.0.0.1:5000/generate", json={"input_text": user_input})
+        if response.status_code == 200:
+            description = response.json().get('description', 'No description generated.')
+            st.success(description)
+        else:
+            st.error("Error in generating description.")
+    else:
+        st.warning("Please enter some text.")
 
 # Steps to use Descriptive AI
-st.markdown('<div class="steps-container">', unsafe_allow_html=True)
+#st.markdown('<div class="steps-container">', unsafe_allow_html=True)
 st.subheader("Steps to use Descriptive AI:")
 st.markdown("1. Enter the appropriate title in the input field.")
 st.image('1.png')
